@@ -1,0 +1,2 @@
+import {database} from '../services/database';
+export async function gardenStats(){const d=await database();const p=await d.getFirstAsync<{points:number}>('SELECT COALESCE(SUM(points),0) points FROM garden_events');const count=await d.getFirstAsync<{n:number}>('SELECT COUNT(*) n FROM garden_events');const points=p?.points??0;return {points,stage:points<10?'Seed':points<30?'Sprout':points<60?'Growing plant':points<100?'Flourishing plant':'Blooming flower',events:count?.n??0};}

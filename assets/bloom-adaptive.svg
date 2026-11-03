@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<g transform="translate(512 425)">
+  <!-- stem and leaves sit behind the bloom -->
+  <path d="M0 95 C-5 190 3 260 0 335" fill="none" stroke="#527B63" stroke-width="27" stroke-linecap="round"/>
+  <path d="M-2 250 C-110 170 -190 198 -198 270 C-128 318 -52 306 -2 250Z" fill="#78A985"/>
+  <path d="M0 294 C92 212 177 230 190 300 C125 352 48 348 0 294Z" fill="#5F906E"/>
+  <path d="M-166 269 Q-90 255 -12 260 M160 300 Q82 285 12 300" fill="none" stroke="#D7E8D9" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+  <!-- six soft, rounded petals -->
+  <g fill="#E9A0B8" stroke="#D982A2" stroke-width="7" stroke-linejoin="round">
+    <g transform="rotate(0)"><path d="M0 16 C-94 -38 -112 -155 -54 -245 C-27 -287 27 -287 54 -245 C112 -155 94 -38 0 16Z"/></g>
+    <g transform="rotate(60)"><path d="M0 16 C-94 -38 -112 -155 -54 -245 C-27 -287 27 -287 54 -245 C112 -155 94 -38 0 16Z"/></g>
+    <g transform="rotate(120)"><path d="M0 16 C-94 -38 -112 -155 -54 -245 C-27 -287 27 -287 54 -245 C112 -155 94 -38 0 16Z"/></g>
+    <g transform="rotate(180)"><path d="M0 16 C-94 -38 -112 -155 -54 -245 C-27 -287 27 -287 54 -245 C112 -155 94 -38 0 16Z"/></g>
+    <g transform="rotate(240)"><path d="M0 16 C-94 -38 -112 -155 -54 -245 C-27 -287 27 -287 54 -245 C112 -155 94 -38 0 16Z"/></g>
+    <g transform="rotate(300)"><path d="M0 16 C-94 -38 -112 -155 -54 -245 C-27 -287 27 -287 54 -245 C112 -155 94 -38 0 16Z"/></g>
+  </g>
+  <circle cx="0" cy="0" r="66" fill="#F4C96D" stroke="#D9A94F" stroke-width="8"/>
+  <circle cx="-19" cy="-18" r="10" fill="#FFF2C9" opacity=".9"/>
+  <circle cx="22" cy="15" r="8" fill="#FFF2C9" opacity=".75"/>
+</g></svg>
