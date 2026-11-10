@@ -6,9 +6,17 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#F8E8EE"
+        }
+      ]
     ],
     "android": {
       "package": "com.bloom.wellness",
@@ -25,11 +33,6 @@
     "experiments": {
       "typedRoutes": true
     },
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#F8E8EE"
-    }
+    "icon": "./assets/icon.png"
   }
 }
