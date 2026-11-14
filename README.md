@@ -1,85 +1,109 @@
-# Bloom — Personal Wellness Tracker
+# Bloom
 
-A local-first wellness tracker built with Expo SDK 58, React Native 0.88, TypeScript, Expo Router and standard Expo SQLite. The project is configured for Expo Go; it does not require SQLCipher, a custom development client, login, or a cloud backend.
+Bloom is a personal wellness tracker for Android, built with Expo, React Native, TypeScript, Expo Router, and SQLite. Track everyday habits and wellness routines in one place, with your data kept on your device.
 
-## Implemented workflows
-- No login, registration, account, or cloud backend.
-- First-launch name setup, short tutorial, tutorial replay.
-- Five primary tabs: Home, Habits, Journal, Progress, Settings.
-- Daily quote selected by local calendar date and stable during that date.
-- Home shows a maximum of three habits, incomplete first, then completed; full habit list remains in Habits.
-- Habit create/edit/delete and daily completion records.
-- Water logging, custom amount, optional user-defined goal, undo, daily total and history service.
-- Morning/night skincare checklists, completion state and guided step-by-step mode.
-- Journal create/edit/delete. Entries are stored as ordinary local SQLite text.
-- Mood check-in, editing today's selection and recent history.
-- Bloom Garden growth points, five stages and persisted achievement unlocks.
-- Four persistent themes: Soft Bloom, Lavender, Sage, Dark.
-- Weekly habit progress based on saved daily records.
-- No notification or reminder features or permissions.
-- Database upgrades cancel any legacy scheduled reminders once.
-- SQLite schema versioning/migrations, repository separation and EAS build profiles.
+> **Project status:** The release APK has been tested on an Android device, and all app features were confirmed working in that device test. TypeScript checks, the Jest test suite, Expo dependency compatibility, and an Android bundle export have also been verified. See [IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md) for verification details.
 
-## Storage and privacy
-Bloom has no account or cloud backend. App data is stored locally in a standard SQLite database on the device. SQLCipher and application-level journal encryption have been removed to keep the project simple and compatible with Expo Go. Local SQLite storage is **not encrypted by this app**; do not store highly sensitive information in the journal. Device-level security and backups are controlled by Android.
+## Features
 
-## Expo Go setup
-Use Node.js LTS and npm. From this project directory:
+- Habit tracking with daily completion and weekly progress.
+- Water logging, custom amounts, and a personal daily goal.
+- Morning and evening skincare checklists.
+- Journal entries and daily mood check-ins.
+- A garden that grows with your progress and tracks achievements.
+- Daily quotes and four themes: Soft Bloom, Lavender, Sage, and Dark.
+- On-device data storage; no account or cloud service required.
 
-If you previously tried installing dependencies and got an `ERESOLVE` peer-dependency error, first remove the old install and lockfile:
+## Install the Android APK
 
-**PowerShell (Windows):**
-```powershell
-Remove-Item -Recurse -Force node_modules -ErrorAction SilentlyContinue
-Remove-Item package-lock.json -ErrorAction SilentlyContinue
-npm install
-npx expo start -c
-```
+The tested APK will be published as an asset on the [GitHub Releases page](https://github.com/shubhamvermaaa71/Bloom/releases/latest). After the release is available:
 
-The project pins React and React DOM to the Expo SDK 58-compatible `19.3.0` release. The included `.npmrc` enables legacy peer resolution for transitive UI packages with overly restrictive peer declarations. Do not run `npx expo install --fix` unless Expo reports a specific SDK package mismatch.
+1. Open the Releases page on your Android device and download the APK.
+2. Open the downloaded file and follow Android's install prompts.
+3. If Android asks, allow your browser or file manager to install apps from that source.
 
-Open Expo Go on your Android phone and scan the QR code. Ensure Expo Go is compatible with Expo SDK 58. If Metro reports a package-version mismatch, run:
+## Run from source
+
+### Requirements
+
+- Node.js LTS and npm.
+- Android phone with a compatible Expo Go app, or an Android emulator.
+- Git to clone the repository.
+
+Expo Go only supports SDK versions compatible with the Expo Go release installed on your device. If your Expo Go version is incompatible, use the Android build instructions below.
+
+### Start with Expo Go
 
 ```bash
-npx expo install --fix
-npx expo start -c
+git clone https://github.com/shubhamvermaaa71/Bloom.git
+cd Bloom
+npm ci
+npx expo start
 ```
 
-The app uses `expo-sqlite`, which is included in Expo Go for this SDK. Native launcher icon and splash changes are visible in a standalone EAS build, not necessarily inside Expo Go.
+Open Expo Go on your Android device and scan the QR code. Keep the computer and phone on the same network, or use Expo CLI's tunnel connection option if your network prevents direct access.
 
-## Typecheck and tests
+To launch on an available Android emulator:
+
+```bash
+npm run android
+```
+
+The repository includes an npm lockfile and `.npmrc` dependency-resolution settings. Use `npm ci` for a clean, reproducible install.
+
+## Build Android from source
+
+### Option 1: Build and run locally
+
+For a local Android build, install Android Studio with the Android SDK and Java JDK configured, then start an Android emulator or connect an Android device with USB debugging enabled. From the project directory, run:
+
+```bash
+npm ci
+npx expo run:android
+```
+
+Expo generates the native Android project if needed, compiles the app, and installs it on the available emulator or connected device. This is a local development build; it does not produce the signed release APK. No EAS account is needed.
+
+### Option 2: Build an APK or AAB with EAS
+
+The EAS profiles are configured in [`eas.json`](./eas.json):
+
+- **Preview** creates an installable APK for testing.
+- **Production** creates an Android App Bundle (AAB), typically used for Play Store submission.
+
+Install and sign in to EAS CLI:
+
+```bash
+npm install --global eas-cli
+eas login
+```
+
+Build an APK:
+
+```bash
+eas build --platform android --profile preview
+```
+
+Build a production AAB:
+
+```bash
+eas build --platform android --profile production
+```
+
+EAS builds the Android native app from this repository's source. When a build completes, download the APK or AAB from the build link printed by EAS. The production AAB is not a directly installable APK. An EAS account and internet access are required for cloud builds.
+
+## Verify the source
+
 ```bash
 npm run typecheck
 npm test
 ```
 
-## EAS Android builds
-```bash
-npm install -g eas-cli
-eas login
-eas build:configure
-npm run build:preview
-npm run build:production
-```
+## Privacy and data
 
-`preview` produces an installable APK. `production` produces an Android App Bundle (AAB).
-
-## Manual device QA checklist
-1. Start in Expo Go and complete onboarding.
-2. Close/reopen the app; confirm name and onboarding state persist.
-3. Create 4+ habits; Home should show only 3 and incomplete habits first.
-4. Toggle, edit and delete habits.
-5. Log quick-add and custom water amounts; verify total and undo.
-6. Set a personal water goal and verify progress.
-7. Add Morning and Night skincare steps; mark complete; try guided mode.
-8. Create, edit, delete journal entries; verify content persists after restart.
-9. Save and edit mood; inspect history.
-10. Earn achievements and confirm they remain unlocked.
-11. Switch all four themes and restart.
-12. Review weekly progress against actual daily records.
-13. Review the water fill and its continuous wave movement in the running app.
-14. Reset all data; confirm onboarding returns.
+Bloom does not require login and does not send journal or wellness data to a Bloom cloud backend. App data is stored in a standard SQLite database on the device. **The app does not encrypt this local database.** Avoid storing highly sensitive information in the journal. Device security and backups are managed by Android.
 
 ## Known limitations
-- No physical-device QA has been performed as part of this source update.
-- Native launcher icon and splash-screen branding require a standalone build to verify.
+
+- The APK is distributed through GitHub Releases rather than committed to the source repository.
+- Expo Go may display its own launcher icon and splash screen; use the tested APK to see the standalone Android branding.

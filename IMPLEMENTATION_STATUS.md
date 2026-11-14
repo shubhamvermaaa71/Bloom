@@ -4,7 +4,7 @@ This source update removes SQLCipher configuration, SecureStore-based journal ke
 
 The existing screens, local repositories, onboarding, flower branding, themes, garden, quotes, habit tracking, skincare, mood tracking, and progress have been retained. Notification and reminder workflows have been removed; the versioned upgrade only cancels any reminders scheduled by older versions.
 
-**Verified:** TypeScript compilation, Jest (2 suites, 5 tests), Expo SDK dependency compatibility, and Android bundle export. Physical-device startup, screen-by-screen visual inspection, SQLite persistence on-device, and multi-loop water-animation inspection have not been verified in this environment.
+**Verified:** TypeScript compilation, Jest (2 suites, 5 tests), Expo SDK dependency compatibility, and Android bundle export. The release APK has also been tested on an Android device, with all app features confirmed working in that device test.
 
 Storage is local but not encrypted by this app. Do not store highly sensitive information in the journal.
 
