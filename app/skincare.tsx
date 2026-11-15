@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Alert, Pressable, Switch, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import {
   Screen, Card, Heading, Field, Button, Muted, Label, Row, SectionHeading,
@@ -153,7 +154,7 @@ export default function Skincare() {
   const monthly = history?.monthly.find(item => item.routine === routine);
 
   return (
-    <Screen safeAreaBottom>
+    <Screen>
       <Heading sub="Simple steps, in the order that works for you.">Skin care</Heading>
 
       <View style={{ flexDirection: 'row', gap: spacing.xs, padding: spacing.xxs, borderRadius: radii.card, backgroundColor: colors.soft, marginBottom: spacing.md }}>
@@ -233,18 +234,18 @@ export default function Skincare() {
                       {step.is_optional ? 'Optional · ' : ''}{status === 'completed' ? 'Completed' : status === 'skipped' ? 'Skipped' : 'Not completed'}
                     </Text>
                   </View>
-                  <Pressable accessibilityRole="button" onPress={() => beginEdit(step)} style={{ minWidth: spacing.touchTarget, minHeight: spacing.touchTarget, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: colors.accent, fontSize: typography.label, fontWeight: '700' }}>Edit</Text>
+                  <Pressable accessibilityRole="button" accessibilityLabel={`Edit ${step.label}`} onPress={() => beginEdit(step)} style={({ pressed }) => ({ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radii.control, backgroundColor: colors.soft, opacity: pressed ? 0.75 : 1 })}>
+                    <Ionicons name="pencil-outline" size={18} color={colors.accent} />
                   </Pressable>
                 </Row>
                 <View style={{ flexDirection: 'row', gap: spacing.xs, marginTop: spacing.sm }}>
                   {status === 'pending' ? (
                     <>
-                      <Button title="Complete" onPress={() => setStatus(step, 'completed')} />
-                      <Button title="Skip today" secondary onPress={() => setStatus(step, 'skipped')} />
+                      <Button style={{ flex: 1 }} title="Complete" onPress={() => setStatus(step, 'completed')} />
+                      <Button style={{ flex: 1 }} title="Skip today" secondary onPress={() => setStatus(step, 'skipped')} />
                     </>
                   ) : (
-                    <Button title={status === 'completed' ? 'Undo completion' : 'Undo skip'} secondary onPress={() => setStatus(step, 'pending')} />
+                    <Button style={{ flex: 1 }} title={status === 'completed' ? 'Undo completion' : 'Undo skip'} secondary onPress={() => setStatus(step, 'pending')} />
                   )}
                 </View>
               </Card>
@@ -338,11 +339,11 @@ export default function Skincare() {
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Pressable accessibilityRole="button" accessibilityLabel={`Move ${step.label} up`} disabled={index === 0} onPress={() => moveStep(index, -1)} style={{ minWidth: spacing.touchTarget, minHeight: spacing.touchTarget, alignItems: 'center', justifyContent: 'center', opacity: index === 0 ? 0.35 : 1 }}>
-                  <Text style={{ color: colors.accent, fontSize: 20 }}>↑</Text>
+                <Pressable accessibilityRole="button" accessibilityLabel={`Move ${step.label} up`} accessibilityState={{ disabled: index === 0 }} disabled={index === 0} onPress={() => moveStep(index, -1)} style={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: radii.control, backgroundColor: colors.soft, opacity: index === 0 ? 0.4 : 1 }}>
+                  <Ionicons name="chevron-up" size={19} color={colors.accent} />
                 </Pressable>
-                <Pressable accessibilityRole="button" accessibilityLabel={`Move ${step.label} down`} disabled={index === allSteps.length - 1} onPress={() => moveStep(index, 1)} style={{ minWidth: spacing.touchTarget, minHeight: spacing.touchTarget, alignItems: 'center', justifyContent: 'center', opacity: index === allSteps.length - 1 ? 0.35 : 1 }}>
-                  <Text style={{ color: colors.accent, fontSize: 20 }}>↓</Text>
+                <Pressable accessibilityRole="button" accessibilityLabel={`Move ${step.label} down`} accessibilityState={{ disabled: index === allSteps.length - 1 }} disabled={index === allSteps.length - 1} onPress={() => moveStep(index, 1)} style={{ width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: radii.control, backgroundColor: colors.soft, opacity: index === allSteps.length - 1 ? 0.4 : 1 }}>
+                  <Ionicons name="chevron-down" size={19} color={colors.accent} />
                 </Pressable>
               </View>
             </Row>

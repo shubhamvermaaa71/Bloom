@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, Text } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { Screen, Card, Heading, Field, Button, Muted, RadioOption, SectionHeading, spacing, typography } from '../src/ui';
 import { useTheme } from '../src/theme';
 import { getMood, saveMood, moodHistory } from '../src/repositories/mood';
@@ -11,29 +12,37 @@ export default function Mood() {
   const [selected, setSelected] = useState('');
   const [reflection, setReflection] = useState('');
   const [history, setHistory] = useState<any[]>([]);
+  const [saving, setSaving] = useState(false);
 
-  const load = async () => {
-    const mood = await getMood();
-    if (mood) {
-      setSelected(mood.mood);
-      setReflection(mood.reflection);
-    }
-    setHistory(await moodHistory());
-  };
-  useEffect(() => { load(); }, []);
+  const load = useCallback(async () => {
+    const [mood, entries] = await Promise.all([getMood(), moodHistory()]);
+    setSelected(mood?.mood ?? '');
+    setReflection(mood?.reflection ?? '');
+    setHistory(entries);
+  }, []);
+  useFocusEffect(useCallback(() => {
+    load().catch(error => Alert.alert('Mood check-in unavailable', error instanceof Error ? error.message : 'Please try again.'));
+  }, [load]));
 
   const save = async () => {
     if (!selected) {
       Alert.alert('Choose a mood', 'Select one option first.');
       return;
     }
-    await saveMood(selected, reflection);
-    await load();
-    Alert.alert('Saved', 'Your check-in is stored on this device.');
+    setSaving(true);
+    try {
+      await saveMood(selected, reflection);
+      await load();
+      Alert.alert('Saved', 'Your check-in is stored on this device.');
+    } catch (error) {
+      Alert.alert('Could not save check-in', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <Screen safeAreaBottom>
+    <Screen>
       <Heading sub="A personal reflection, not a medical assessment.">Mood check-in</Heading>
 
       <Card>
@@ -57,7 +66,7 @@ export default function Mood() {
           textAlignVertical="top"
           style={{ minHeight: 104, marginTop: spacing.xxs }}
         />
-        <Button title="Save today's check-in" onPress={save} />
+        <Button title={saving ? 'Saving…' : "Save today's check-in"} disabled={saving} onPress={save} />
       </Card>
 
       <SectionHeading sub="Your previous check-ins">Mood history</SectionHeading>

@@ -3,41 +3,76 @@ import { Alert, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useTheme } from '../../src/theme';
-import { Button, Card, Muted, Row, Screen, SectionHeading, spacing, typography, radii } from '../../src/ui';
+import { Button, Card, Muted, Row, Screen, SectionHeading, spacing, typography, radii, surfaceShadow, fontFamilies } from '../../src/ui';
 import { Quote } from '../../src/components/Quote';
+import { HabitCheckbox } from '../../src/components/HabitCheckbox';
 import { listHabits, toggleHabit } from '../../src/repositories/habits';
 import { getSetting } from '../../src/repositories/settings';
 import { waterTotal } from '../../src/repositories/water';
 
-type FeatureTileProps = {
+type FeatureCardProps = {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   detail: string;
   onPress: () => void;
 };
 
-function FeatureTile({ icon, title, detail, onPress }: FeatureTileProps) {
-  const { colors } = useTheme();
+function FeatureCard({ icon, title, detail, onPress }: FeatureCardProps) {
+  const { colors, theme } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 76,
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: spacing.sm,
+        marginBottom: spacing.sm,
+        borderRadius: radii.card,
+        borderWidth: 1,
+        borderColor: colors.border,
+        backgroundColor: colors.card,
+        ...surfaceShadow(theme === 'Dark'),
+        opacity: pressed ? 0.84 : 1,
+      })}
+    >
+      <View style={{ width: 46, height: 46, borderRadius: 16, backgroundColor: colors.soft, alignItems: 'center', justifyContent: 'center', marginRight: spacing.sm }}>
+        <Ionicons name={icon} size={22} color={colors.accent} />
+      </View>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={{ color: colors.text, fontSize: typography.body, fontWeight: '700', letterSpacing: 0.1 }}>{title}</Text>
+        <Text style={{ color: colors.muted, fontSize: typography.secondary, lineHeight: 18, marginTop: spacing.xxs }}>{detail}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+    </Pressable>
+  );
+}
+
+function ExploreLink({ icon, title, onPress }: { icon: keyof typeof Ionicons.glyphMap; title: string; onPress: () => void }) {
+  const { colors, theme } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => ({
         flex: 1,
-        minHeight: 132,
-        padding: spacing.md,
-        borderRadius: radii.card,
+        minHeight: spacing.touchTarget + spacing.sm,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: spacing.xs,
+        paddingHorizontal: spacing.xs,
+        borderRadius: radii.tile,
         borderWidth: 1,
         borderColor: colors.border,
         backgroundColor: colors.card,
-        opacity: pressed ? 0.84 : 1,
+        ...surfaceShadow(theme === 'Dark'),
+        opacity: pressed ? 0.82 : 1,
       })}
     >
-      <View style={{ width: 42, height: 42, borderRadius: 15, backgroundColor: colors.soft, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm }}>
-        <Ionicons name={icon} size={22} color={colors.accent} />
-      </View>
-      <Text style={{ color: colors.text, fontSize: typography.body, fontWeight: '700', letterSpacing: 0.1 }}>{title}</Text>
-      <Text style={{ color: colors.muted, fontSize: typography.secondary, lineHeight: 18, marginTop: spacing.xxs }}>{detail}</Text>
+      <Ionicons name={icon} size={19} color={colors.accent} />
+      <Text style={{ color: colors.text, fontSize: typography.secondary, fontWeight: '600' }}>{title}</Text>
     </Pressable>
   );
 }
@@ -72,7 +107,7 @@ export default function Home() {
           <Text style={{ color: colors.muted, fontSize: typography.secondary, fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase' }}>
             {now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
           </Text>
-          <Text style={{ color: colors.text, fontSize: typography.title, lineHeight: 35, fontWeight: '800', letterSpacing: -0.5, marginTop: spacing.xs }}>
+          <Text style={{ fontFamily: fontFamilies.heading, color: colors.text, fontSize: typography.title, lineHeight: 37, fontWeight: '700', letterSpacing: -0.4, marginTop: spacing.xs }}>
             {greeting},{'\n'}{name} <Text style={{ color: colors.accent }}>✿</Text>
           </Text>
         </View>
@@ -94,11 +129,10 @@ export default function Home() {
 
       <Quote />
 
-      <SectionHeading>Your daily care</SectionHeading>
-      <View style={{ flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl }}>
-        <FeatureTile icon="water-outline" title="Water" detail={`${water.toLocaleString()} ml today`} onPress={() => router.push('/water')} />
-        <FeatureTile icon="leaf-outline" title="Bloom Garden" detail="Your growth, gently." onPress={() => router.push('/garden')} />
-      </View>
+      <SectionHeading sub="Choose a small way to care for yourself.">Your daily care</SectionHeading>
+      <FeatureCard icon="water-outline" title="Water" detail={`${water.toLocaleString()} ml today`} onPress={() => router.push('/water')} />
+      <FeatureCard icon="sparkles-outline" title="Skincare" detail="Make time for your daily routine." onPress={() => router.push('/skincare')} />
+      <FeatureCard icon="sunny-outline" title="Mood" detail="Check in with how you're feeling." onPress={() => router.push('/mood')} />
 
       <Card>
         <Row>
@@ -124,9 +158,7 @@ export default function Home() {
               }}
               style={({ pressed }) => ({ minHeight: spacing.touchTarget + spacing.xs, paddingVertical: spacing.xs, borderBottomWidth: index === habits.length - 1 ? 0 : 1, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center', opacity: pressed ? 0.75 : 1 })}
             >
-              <View style={{ width: 36, height: 36, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: habit.completed ? colors.green : colors.soft }}>
-                <Ionicons name={habit.completed ? 'checkmark' : 'ellipse-outline'} size={21} color={habit.completed ? '#FFFFFF' : colors.muted} />
-              </View>
+              <HabitCheckbox completed={Boolean(habit.completed)} size={36} />
               <View style={{ flex: 1, minWidth: 0, marginLeft: spacing.sm, marginRight: spacing.xs }}>
                 <Text style={{ color: colors.text, fontSize: typography.body, fontWeight: '600' }}>{habit.name}</Text>
                 <Text style={{ color: colors.muted, fontSize: typography.secondary, marginTop: spacing.xxs }}>{habit.category}</Text>
@@ -137,23 +169,10 @@ export default function Home() {
         <Button title="Open habit tracker" secondary onPress={() => router.push('/(tabs)/habits')} />
       </Card>
 
-      <SectionHeading>A moment for you</SectionHeading>
+      <SectionHeading>Explore more</SectionHeading>
       <View style={{ flexDirection: 'row', gap: spacing.xs }}>
-        {[
-          { title: 'Skincare', icon: 'sparkles-outline' as const, path: '/skincare' },
-          { title: 'Mood', icon: 'sunny-outline' as const, path: '/mood' },
-          { title: 'Journal', icon: 'book-outline' as const, path: '/(tabs)/journal' },
-        ].map(item => (
-          <Pressable
-            key={item.title}
-            accessibilityRole="button"
-            onPress={() => router.push(item.path as any)}
-            style={({ pressed }) => ({ flex: 1, minWidth: 0, minHeight: 92, alignItems: 'center', justifyContent: 'center', gap: spacing.xs, paddingHorizontal: spacing.xxs, borderRadius: radii.tile, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.card, opacity: pressed ? 0.8 : 1 })}
-          >
-            <Ionicons name={item.icon} size={21} color={colors.accent} />
-            <Text style={{ color: colors.text, fontSize: typography.secondary, fontWeight: '600', textAlign: 'center' }}>{item.title}</Text>
-          </Pressable>
-        ))}
+        <ExploreLink icon="leaf-outline" title="Bloom Garden" onPress={() => router.push('/garden')} />
+        <ExploreLink icon="book-outline" title="Journal" onPress={() => router.push('/(tabs)/journal')} />
       </View>
     </Screen>
   );

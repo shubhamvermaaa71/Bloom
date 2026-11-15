@@ -21,6 +21,7 @@ export default function Settings() {
   const [goalOption, setGoalOption] = useState('2000');
   const [customGoal, setCustomGoal] = useState('');
   const [waterGoalOffset, setWaterGoalOffset] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -51,19 +52,30 @@ export default function Settings() {
       return;
     }
 
-    await setSetting('name', name.trim() || 'Friend');
-    await setSetting('waterGoal', String(goal));
-    Alert.alert('Saved', 'Your Bloom preferences are up to date.');
+    setSaving(true);
+    try {
+      await setSetting('name', name.trim() || 'Friend');
+      await setSetting('waterGoal', String(goal));
+      Alert.alert('Saved', 'Your Bloom preferences are up to date.');
+    } catch (error) {
+      Alert.alert('Could not save preferences', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const reset = () => Alert.alert('Reset Bloom?', 'This permanently deletes your local habits, journal, mood, skincare, water history, settings and garden progress.', [
     { text: 'Cancel' },
     { text: 'Reset everything', style: 'destructive', onPress: async () => {
-      const db = await database();
-      await db.execAsync('DELETE FROM habits;DELETE FROM habit_logs;DELETE FROM water_logs;DELETE FROM skincare_steps;DELETE FROM skincare_logs;DELETE FROM journal;DELETE FROM moods;DELETE FROM garden_events;DELETE FROM achievements;DELETE FROM settings;');
-      await db.execAsync('DELETE FROM skincare_routines;');
-      await migrateSkincareRoutines(db);
-      router.replace('/onboarding');
+      try {
+        const db = await database();
+        await db.execAsync('DELETE FROM habits;DELETE FROM habit_logs;DELETE FROM water_logs;DELETE FROM skincare_steps;DELETE FROM skincare_logs;DELETE FROM journal;DELETE FROM moods;DELETE FROM garden_events;DELETE FROM achievements;DELETE FROM settings;');
+        await db.execAsync('DELETE FROM skincare_routines;');
+        await migrateSkincareRoutines(db);
+        router.replace('/onboarding');
+      } catch (error) {
+        Alert.alert('Could not reset Bloom', error instanceof Error ? error.message : 'Please try again.');
+      }
     } },
   ]);
 
@@ -92,7 +104,7 @@ export default function Settings() {
         {goalOption === 'custom' ? <Field value={customGoal} onChangeText={setCustomGoal} keyboardType="number-pad" placeholder="Daily goal in ml" /> : null}
       </Card>
 
-      <Button title="Save preferences" onPress={save} />
+      <Button title={saving ? 'Saving…' : 'Save preferences'} disabled={saving} onPress={save} />
       <Button title="Replay tutorial" secondary onPress={() => router.push('/onboarding?replay=1')} />
       <Button title="Reset all Bloom data" danger onPress={reset} />
 

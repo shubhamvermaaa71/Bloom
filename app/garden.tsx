@@ -14,6 +14,8 @@ const stages = [
   { name: 'Growing plant', points: 30 },
   { name: 'Flourishing plant', points: 60 },
   { name: 'Blooming flower', points: 100 },
+  { name: 'Radiant bloom', points: 150 },
+  { name: 'Garden of abundance', points: 250 },
 ];
 
 function GardenFlower({ stage }: { stage: number }) {
@@ -28,6 +30,7 @@ function GardenFlower({ stage }: { stage: number }) {
         : <Path d="M75 143 Q90 126 105 143Z" fill={colors.green} opacity={0.5}/>}
       {stage >= 2 ? <Path d="M91 125 C72 102 59 108 57 115 C68 128 79 131 91 125Z M92 112 C106 91 122 95 125 103 C116 116 105 119 92 112Z" fill={colors.green} opacity={0.95}/> : null}
       {stage >= 3 ? <Path d="M91 92 C74 72 65 76 63 83 C73 96 81 99 91 92Z" fill={colors.green}/> : null}
+      {stage >= 5 ? <><Circle cx="58" cy="51" r="3" fill={colors.accent} opacity={0.75}/><Circle cx="125" cy="70" r="2.5" fill="#F2C46D"/><Circle cx="126" cy="39" r="2" fill={colors.accent} opacity={0.65}/></> : null}
       {petals > 0 ? Array.from({ length: petals }, (_, index) => (
         <Ellipse key={index} cx="92" cy={52 - flowerSize * 0.62} rx={flowerSize * 0.48} ry={flowerSize * 0.78} fill={colors.accent} transform={`rotate(${index * (360 / petals)} 92 52)`}/>
       )) : null}
@@ -60,7 +63,7 @@ export default function Garden() {
   const unlocked = achievements.filter(item => item.unlocked).length;
 
   return (
-    <Screen safeAreaBottom>
+    <Screen>
       <Heading sub="Every caring moment helps your garden grow.">Bloom Garden</Heading>
 
       <Card style={{ alignItems: 'center', paddingVertical: spacing.lg, backgroundColor: colors.soft, borderWidth: 0 }}>

@@ -2,9 +2,10 @@ import { useCallback, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
-import { Screen, Card, Heading, Button, Field, Label, Row, Muted, spacing, typography, radii } from '../../src/ui';
+import { Screen, Card, Heading, Button, Field, Label, Row, Muted, spacing, typography, radii, fontFamilies } from '../../src/ui';
 import { useTheme } from '../../src/theme';
 import { listHabits, saveHabit, deleteHabit, toggleHabit } from '../../src/repositories/habits';
+import { HabitCheckbox } from '../../src/components/HabitCheckbox';
 
 export default function Habits() {
   const { colors } = useTheme();
@@ -12,6 +13,7 @@ export default function Habits() {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Personal');
   const [editing, setEditing] = useState<string | undefined>();
+  const [saving, setSaving] = useState(false);
   const load = useCallback(() => { listHabits().then(setItems).catch(error => Alert.alert('Habits unavailable', String(error))); }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -25,6 +27,8 @@ export default function Habits() {
   };
 
   const add = async () => {
+    if (saving) return;
+    setSaving(true);
     try {
       await saveHabit(name, category, editing);
       setName('');
@@ -32,6 +36,17 @@ export default function Habits() {
       load();
     } catch (error) {
       Alert.alert('Check habit', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async (habitId: string) => {
+    try {
+      await deleteHabit(habitId);
+      load();
+    } catch (error) {
+      Alert.alert('Could not delete habit', error instanceof Error ? error.message : 'Please try again.');
     }
   };
 
@@ -42,7 +57,7 @@ export default function Habits() {
         <Label>{editing ? 'Edit habit' : 'Add a habit'}</Label>
         <Field value={name} onChangeText={setName} placeholder="e.g. Read for 10 minutes" returnKeyType="done" />
         <Field value={category} onChangeText={setCategory} placeholder="Category" returnKeyType="done" />
-        <Button title={editing ? 'Save changes' : 'Add habit'} onPress={add} />
+        <Button title={saving ? 'Saving…' : editing ? 'Save changes' : 'Add habit'} disabled={saving} onPress={add} />
         {editing ? <Button title="Cancel" secondary onPress={() => { setEditing(undefined); setName(''); }} /> : null}
       </Card>
 
@@ -57,32 +72,34 @@ export default function Habits() {
               hitSlop={4}
               style={({ pressed }) => ({
                 width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
-                backgroundColor: habit.completed ? colors.green : colors.soft,
-                borderWidth: 1, borderColor: habit.completed ? colors.green : colors.border,
+                backgroundColor: colors.soft,
+                borderWidth: 1, borderColor: colors.border,
                 opacity: pressed ? 0.72 : 1,
               })}
             >
-              <Ionicons name={habit.completed ? 'checkmark' : 'ellipse-outline'} size={24} color={habit.completed ? '#FFFFFF' : colors.muted} />
+              <HabitCheckbox completed={Boolean(habit.completed)} size={30} />
             </Pressable>
             <Pressable onPress={() => toggle(habit.id, habit.completed)} style={{ flex: 1, minWidth: 0, minHeight: spacing.touchTarget, justifyContent: 'center', paddingHorizontal: spacing.sm }}>
-              <Text style={{ color: colors.text, fontSize: 15, lineHeight: 21, fontWeight: '700' }}>{habit.name}</Text>
+              <Text style={{ fontFamily: fontFamilies.body, color: colors.text, fontSize: 15, lineHeight: 21, fontWeight: '700' }}>{habit.name}</Text>
               <Text style={{ color: colors.muted, fontSize: typography.secondary, lineHeight: 17, marginTop: spacing.xxs }}>{habit.category}{habit.completed ? ' · Done for today' : ''}</Text>
             </Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel={`Edit ${habit.name}`} onPress={() => { setEditing(habit.id); setName(habit.name); setCategory(habit.category); }} style={{ width: spacing.touchTarget, height: spacing.touchTarget, alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="pencil-outline" size={18} color={colors.accent} />
-            </Pressable>
+            <View style={{ flexDirection: 'row', gap: spacing.xs }}>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Edit ${habit.name}`} onPress={() => { setEditing(habit.id); setName(habit.name); setCategory(habit.category); }} style={({ pressed }) => ({ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radii.control, backgroundColor: colors.soft, opacity: pressed ? 0.72 : 1 })}>
+                <Ionicons name="pencil-outline" size={18} color={colors.accent} />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Delete ${habit.name}`}
+                onPress={() => Alert.alert('Delete habit?', `Delete "${habit.name}" and its history?`, [
+                  { text: 'Keep habit', style: 'cancel' },
+                  { text: 'Delete', style: 'destructive', onPress: () => { void remove(habit.id); } },
+                ])}
+                style={({ pressed }) => ({ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radii.control, backgroundColor: '#FCEBED', opacity: pressed ? 0.72 : 1 })}
+              >
+                <Ionicons name="trash-outline" size={18} color="#A52C45" />
+              </Pressable>
+            </View>
           </Row>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => Alert.alert('Delete habit?', `Delete "${habit.name}" and its history?`, [
-              { text: 'Keep habit', style: 'cancel' },
-              { text: 'Delete', style: 'destructive', onPress: async () => { await deleteHabit(habit.id); load(); } },
-            ])}
-            style={({ pressed }) => ({ alignSelf: 'flex-start', minHeight: spacing.touchTarget, marginTop: spacing.control, flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.md, borderRadius: radii.control, backgroundColor: '#FCEBED', opacity: pressed ? 0.75 : 1 })}
-          >
-            <Ionicons name="trash-outline" size={16} color="#A52C45" />
-            <Text style={{ color: '#A52C45', fontSize: 13, fontWeight: '800' }}>Delete</Text>
-          </Pressable>
         </Card>
       ))}
     </Screen>
