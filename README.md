@@ -16,7 +16,7 @@ Bloom is a personal wellness tracker for Android, built with Expo, React Native,
 
 ## Install the Android APK
 
-The tested APK will be published as an asset on the [GitHub Releases page](https://github.com/shubhamvermaaa71/Bloom/releases/latest). After the release is available:
+The tested APK will be published as an asset on the [GitHub Releases page](https://github.com/shubhamvermaaa71/Bloom/releases/latest).
 
 1. Open the Releases page on your Android device and download the APK.
 2. Open the downloaded file and follow Android's install prompts.
@@ -101,9 +101,8 @@ npm test
 
 ## Privacy and data
 
-Bloom does not require login and does not send journal or wellness data to a Bloom cloud backend. App data is stored in a standard SQLite database on the device. **The app does not encrypt this local database.** Avoid storing highly sensitive information in the journal. Device security and backups are managed by Android.
+Bloom does not require login and does not send journal or wellness data to a Bloom cloud backend. App data is stored in a standard SQLite database on the device. 
 
 ## Known limitations
 
-- The APK is distributed through GitHub Releases rather than committed to the source repository.
 - Expo Go may display its own launcher icon and splash screen; use the tested APK to see the standalone Android branding.
